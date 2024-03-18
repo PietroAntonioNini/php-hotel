@@ -36,6 +36,37 @@
             'distance_to_center' => 50
         ],
     ];
+
+    //funzione per filtrare gli hotel in base ai checkbox
+    function filterHotels($hotels, $parkingChecked, $rankChecked)
+    {
+        $filteredHotels = [];
+
+        foreach ($hotels as $hotel) {
+            $addHotel = true;
+
+            if ($parkingChecked && !$hotel['parking']) {
+                $addHotel = false;
+            }
+
+            if ($rankChecked && $hotel['vote'] < 3) {
+                $addHotel = false;
+            }
+
+            if ($addHotel) {
+                $filteredHotels[] = $hotel;
+            }
+        }
+
+        return $filteredHotels;
+    }
+
+    //verifico se i checkbox sono stati selezionati
+    $parkingChecked = isset($_GET['parking']) ? $_GET['parking'] : false;
+    $rankChecked = isset($_GET['rank']) ? $_GET['rank'] : false;
+
+    // Filtra gli hotels
+    $filteredHotels = filterHotels($hotels, $parkingChecked, $rankChecked);
 ?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
@@ -59,9 +90,9 @@
             <input class="me-5" type="checkbox" id="parking" name="parking" value="yes">
 
             <label class="me-1" for="rank">
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
+                <i class="fa-solid fa-star text-warning"></i>
             </label>
             <input type="checkbox" id="rank" name="rank" value=">=3">
 
@@ -82,10 +113,10 @@
             <tbody>
                 <?php 
     
-                foreach ($hotels as $currentHotel) {
+                foreach ($filteredHotels as $hotel) {
                     echo "<tr>";
     
-                    foreach ($currentHotel as $key => $value) {
+                    foreach ($hotel as $key => $value) {
                         if ($key == 'parking') {
                             echo "<td>" . ($value ? 'Yes' : 'No') . "</td>";
                         } else {
